@@ -14,7 +14,7 @@ addpath(genpath('/gpfs/group/n/nad12/RSA/Scripts/CoSMoMVPA-master'))
 
 %% Set analysis parameters
 subjects = {'18y404'};%,'18y566','20y297','20y396','20y415','20y439','20y441','20y444','20y455','21y299','21y437','21y521','21y534','22y422','23y452','23y546','25y543','67o153','67o178','69o144','70o118','71o152','71o193','72o164','73o165','76o120','76o162','78o113','79o108','80o121','80o128','81o125','81o312','83o197'}; 
-rois     = {'BilateralPHG'}; %add in leftHC and right HC for starters
+rois     = {'rBilateralPHG'}; %add in leftHC and right HC for starters
 study_path = '/gpfs/group/n/nad12/RSA/Analysis_ret/FAME_categorymodel_ret_hrf';
 
 % Edit the SPM.mat file to use paths here on Hammer
