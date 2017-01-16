@@ -17,6 +17,10 @@ subjects = {'18y404'};%,'18y566','20y297','20y396','20y415','20y439','20y441','2
 rois     = {'BilateralPHG'}; %add in leftHC and right HC for starters
 study_path = '/gpfs/group/n/nad12/RSA/Analysis_ret/FAME_categorymodel_ret_hrf';
 
+% Edit the SPM.mat file to use paths here on Hammer
+spm_changepath(fullfile(study_path, subjects{1}, 'SPM.mat'), 'S:\nad12\FAME8', '/gpfs/group/n/nad12/RSA')
+spm_changepath(fullfile(study_path, subjects{1}, 'SPM.mat'), '\', '/')
+
 for ss = 1:length(subjects)
  
     %% Computations
