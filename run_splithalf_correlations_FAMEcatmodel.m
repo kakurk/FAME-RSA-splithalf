@@ -173,7 +173,7 @@ for ss = 1:length(subjects)
     %% Write r matrix to Excel
     filename = ['RSAtest_', subjects{ss}, '_' roi_label '_r_.xlsx'];
     H        = [rho]
-    xlswrite(fullfile(output_path, filename, H))
+    xlswrite(fullfile(output_path, filename), H)
 
     %% Write z matrix to Excel
     filename = ['RSAtest_', subjects{ss}, '_' roi_label '_z_.xlsx'];
