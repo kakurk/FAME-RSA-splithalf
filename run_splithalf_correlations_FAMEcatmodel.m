@@ -62,14 +62,9 @@ for ss = 1:length(subjects)
     % stacking)
     % make sure all ds_* changed from here on
     ds_all = cosmo_stack({Target_ds, Lure_ds, New_ds});
-%    ds_ret = cosmo_stack({Ret_Rem_ds, Ret_Know_ds});
 
     % Data set labels
     ds_all.sa.labels = {'Targets';'Lures';'New'};
-    
-%     Target_ds.sa.labels = labels_Target;
-%     Lure_ds.sa.labels = labels_Lure;
-%     New_ds.sa.labels = labels_New;
     
     % cosmo fxn to make sure data in right format
     cosmo_check_dataset(ds_all);
@@ -177,7 +172,7 @@ for ss = 1:length(subjects)
     
     %% Write r matrix to Excel
     filename = ['RSAtest_', subjects{ss}, '_' roi_label '_r_.xlsx'];
-    H        = [rho];
+    H        = [rho]
     xlswrite(fullfile(output_path, filename, H))
 
     %% Write z matrix to Excel
