@@ -61,43 +61,37 @@ for ss = 1:length(subjects)
     % Combine files at encoding and retrieval to create two files (i.e.,
     % stacking)
     % make sure all ds_* changed from here on
-%     ds_enc = cosmo_stack({Enc_Rem_ds, Enc_Know_ds});
- %   ds_ret = cosmo_stack({Ret_Rem_ds, Ret_Know_ds});
+    ds_all = cosmo_stack({Target_ds, Lure_ds, New_ds});
+%    ds_ret = cosmo_stack({Ret_Rem_ds, Ret_Know_ds});
 
     % Data set labels
-    Target_ds.sa.labels = {'Target'};
-    Lure_ds.sa.labels = {'Lure'};
-    New_ds.sa.labels = {'New'};
+    ds_all.sa.labels = {'Targets';'Lures';'New'};
     
 %     Target_ds.sa.labels = labels_Target;
 %     Lure_ds.sa.labels = labels_Lure;
 %     New_ds.sa.labels = labels_New;
     
     % cosmo fxn to make sure data in right format
-    cosmo_check_dataset(Target_ds);
-    cosmo_check_dataset(Lure_ds);
-    cosmo_check_dataset(New_ds);
+    cosmo_check_dataset(ds_all);
     
     % Some sanity checks to ensure that the data has matching features (voxels)
     % and matching targets (conditions)
-    assert(isequal(Target_ds.fa,Lure_ds.fa,New_ds.fa));
-    assert(isequal(Target_ds.sa.targets,Lure_ds.sa.targets,New_ds.sa.targets));
+%     assert(isequal(Target_ds.fa,Lure_ds.fa,New_ds.fa));
+%     assert(isequal(Target_ds.sa.targets,Lure_ds.sa.targets,New_ds.sa.targets));
 
     % change if you change ds_* above
-    nClasses = numel(Target_ds.sa.labels);  %%why isn't this pulling all labels?(NAD10.31.16)
+    nClasses = numel(ds_all.sa.labels);  %%why isn't this pulling all labels?(NAD10.31.16)
 
     % get the sample data - samples are the correlations being ran on each
     % voxel (a bunch of numbers)
-    Target_ds_samples = Target_ds.samples;
-    Lure_ds_samples = Lure_ds.samples;
-    New_ds_samples = New_ds.samples;
+    all_ds_samples = ds_all.samples;
 
     % compute all correlation values between the two halves, resulting
     % in a 6x6 matrix. Store this matrix in a variable 'rho'.
     % Hint: use cosmo_corr (or builtin corr, if the matlab stats toolbox
     %       is available) after transposing the samples in the two halves.
     % >@@>
-    rho = cosmo_corr([Target_ds_samples'  Lure_ds_samples'  New_ds_samples'], 'Pearson');
+    rho = cosmo_corr(all_ds_samples');
     % <@@<
 
     % Correlations are limited between -1 and +1, thus they cannot be normally
