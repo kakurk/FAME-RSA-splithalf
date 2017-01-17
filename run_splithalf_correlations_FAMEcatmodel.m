@@ -168,15 +168,20 @@ for ss = 1:length(subjects)
 
     % Create code to output files...
 
-    %% % store and save results of Weighted Z values
+    %% % store and save results
     output_path = fullfile(study_path, subjects{ss}, 'RSA_Results');
 
     if ~exist(output_path, 'dir')
         mkdir(output_path)
     end
+    
+    %% Write r matrix to Excel
+    filename = ['RSAtest_', subjects{ss}, '_' roi_label '_r_.xlsx'];
+    H        = [rho];
+    xlswrite(fullfile(output_path, filename, H))
 
     %% Write z matrix to Excel
-    filename = ['RSAtest_', subjects{ss}, '_' roi_label 'z_.xlsx'];
+    filename = ['RSAtest_', subjects{ss}, '_' roi_label '_z_.xlsx'];
     H        = [z]
     xlswrite(fullfile(output_path, filename), H)
 
