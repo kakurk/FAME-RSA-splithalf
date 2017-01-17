@@ -171,23 +171,23 @@ for ss = 1:length(subjects)
     end
     
     %% Write r matrix to Excel
-    filename = ['RSAtest_', subjects{ss}, '_' roi_label '_r_.xlsx'];
-    H        = [rho]
-    xlswrite(fullfile(output_path, filename), H)
+    filename = ['RSAtest_', subjects{ss}, '_' roi_label '_rho_.xlsx'];
+    rho %#ok<*NOPTS>
+    xlswrite(fullfile(output_path, filename), rho)
 
     %% Write z matrix to Excel
     filename = ['RSAtest_', subjects{ss}, '_' roi_label '_z_.xlsx'];
-    H        = [z]
-    xlswrite(fullfile(output_path, filename), H)
+    z
+    xlswrite(fullfile(output_path, filename), z)
 
     %% Write wieghted_z matrix to excel
     filename = ['RSAtest_', subjects{ss}, '_' roi_label '_wieghted_z_.xlsx'];
-    H        = [weighted_z]
-    xlswrite(fullfile(output_path, filename), H)
+    weighted_z
+    xlswrite(fullfile(output_path, filename), weighted_z)
 
     %% Write sum of wieghted_z matrix to excel
     filename = ['RSAtest_', subjects{ss}, '_' roi_label '_sum_weighted_z_.xlsx'];
-    H        = [sum_weighted_z]
+    sum_weighted_z
     xlswrite(fullfile(output_path, filename), H)
 
     %% Write .nii output
