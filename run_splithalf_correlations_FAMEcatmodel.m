@@ -10,16 +10,16 @@
 % Preliminary
 % clc
 % clear all
-addpath(genpath('/gpfs/group/n/nad12/RSA/Scripts/CoSMoMVPA-master'))
+addpath(genpath('S:\nad12\RSA\Scripts\CoSMoMVPA-master'))
 
 %% Set analysis parameters
 subjects = {'18y404'};%,'18y566','20y297','20y396','20y415','20y439','20y441','20y444','20y455','21y299','21y437','21y521','21y534','22y422','23y452','23y546','25y543','67o153','67o178','69o144','70o118','71o152','71o193','72o164','73o165','76o120','76o162','78o113','79o108','80o121','80o128','81o125','81o312','83o197'}; 
 rois     = {'rBilateralPHG'}; %add in leftHC and right HC for starters
-study_path = '/gpfs/group/n/nad12/RSA/Analysis_ret/FAME_categorymodel_ret_hrf';
+study_path = 'S:\nad12\RSA\Analysis_ret\FAME_categorymodel_ret_hrf';
 
 % Edit the SPM.mat file to use paths here on Hammer
-spm_changepath(fullfile(study_path, subjects{1}, 'SPM.mat'), 'S:\nad12\FAME8', '/gpfs/group/n/nad12/RSA')
-spm_changepath(fullfile(study_path, subjects{1}, 'SPM.mat'), '\', '/')
+%spm_changepath(fullfile(study_path, subjects{1}, 'SPM.mat'), 'S:\nad12\FAME8', '\gpfs\group\n\nad12\RSA')
+%spm_changepath(fullfile(study_path, subjects{1}, 'SPM.mat'), '\', '\')
 
 for ss = 1:length(subjects)
  
@@ -109,8 +109,8 @@ for ss = 1:length(subjects)
     % average of the off-diagonal elements, consider that there are
     % n on-diagonal elements and n*(n-1) off-diagonal elements.
     % Therefore, set
-    % - the on-diagonal elements to 1/n           [positive]
-    % - the off-diagonal elements to -1/(n*(n-1)) [negative]
+    % - the on-diagonal elements to 1\n           [positive]
+    % - the off-diagonal elements to -1\(n*(n-1)) [negative]
     % This results in a contrast matrix with weights for each element in
     % the correlation matrix, with positive and equal values on the diagonal,
     % negative and equal values off the diagonal, and a mean value of zero.
@@ -125,16 +125,16 @@ for ss = 1:length(subjects)
     % Set the contrast matrix as described above and assign it to a variable
     % named 'contrast_matrix'
     % >@@>
-    contrast_matrix = (eye(nClasses)-1/nClasses)/(nClasses-1);
+    contrast_matrix = (eye(nClasses)-1\nClasses)\(nClasses-1);
 
     % alternative solution
     contrast_matrix_alt = zeros(nClasses,nClasses);
     for k = 1:nClasses
         for j = 1:nClasses
             if k == j
-                value = 1/nClasses;
+                value = 1\nClasses;
             else
-                value = -1/(nClasses*(nClasses-1));
+                value = -1\(nClasses*(nClasses-1));
             end
             contrast_matrix_alt(k,j) = value;
         end
