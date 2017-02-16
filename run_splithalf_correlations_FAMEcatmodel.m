@@ -10,69 +10,78 @@
 % Preliminary
 % clc
 % clear all
-addpath(genpath('S:\nad12\RSA\Scripts\CoSMoMVPA-master'))
+addpath(genpath('/gpfs/group/n/nad12/RSA/Scripts/CoSMoMVPA-master'))
 
 %% Set analysis parameters
 subjects = {'18y404'};%,'18y566','20y297','20y396','20y415','20y439','20y441','20y444','20y455','21y299','21y437','21y521','21y534','22y422','23y452','23y546','25y543','67o153','67o178','69o144','70o118','71o152','71o193','72o164','73o165','76o120','76o162','78o113','79o108','80o121','80o128','81o125','81o312','83o197'}; 
 rois     = {'rBilateralPHG'}; %add in leftHC and right HC for starters
-study_path = 'S:\nad12\RSA\Analysis_ret\FAME_categorymodel_ret_hrf';
+study_path = '/gpfs/group/n/nad12/RSA/Analysis_ret/FAME_categorymodel_ret_hrf';
 
 % Edit the SPM.mat file to use paths here on Hammer
-%spm_changepath(fullfile(study_path, subjects{1}, 'SPM.mat'), 'S:\nad12\FAME8', '\gpfs\group\n\nad12\RSA')
-%spm_changepath(fullfile(study_path, subjects{1}, 'SPM.mat'), '\', '\')
+spm_changepath(fullfile(study_path, subjects{1}, 'SPM.mat'), 'S:\nad12\FAME8', '\gpfs\group\n\nad12\RSA')
+spm_changepath(fullfile(study_path, subjects{1}, 'SPM.mat'), '\', '\')
 
 for ss = 1:length(subjects)
  
     %% Computations
     data_path  = fullfile(study_path, subjects{ss});
     
-     % Average Betas
-   average_betas(subjects{ss}, study_path, 'Targets', '.*Target.*');
-   average_betas(subjects{ss}, study_path, 'Lures', '.*Lure.*');
-   average_betas(subjects{ss}, study_path, 'New', '.*New.*');
-    
+   % Compute odd and even contrasts
+   spm_jobman('initcfg')
+   oddeven_contrasts(subjects{ss}, study_path, 'Targets', '.*Target.*');
+   oddeven_contrasts(subjects{ss}, study_path, 'Lures', '.*Lure.*');
+   oddeven_contrasts(subjects{ss}, study_path, 'New', '.*New.*');
+   
+   % Gather Odd and Even Runs spmT files into a single nii file
+   odd_Ts  = spm_select('FPList', data_path, 'spmT_000[135]');
+   even_Ts = spm_select('FPList', data_path, 'spmT_000[246]');
+   spm_file_merge(odd_Ts, fullfile(data_path, 'glm_T_stats_odd.nii'));
+   spm_file_merge(even_Ts, fullfile(data_path, 'glm_T_stats_even.nii'));
+   
   for rr = 1:length(rois)
 
     roi_label = rois{rr}; % name of ROI mask used for running correlations  
 
     % file locations for both halves
-    Target  = fullfile(data_path, 'average_beta_Targets.nii');
-    Lure    = fullfile(data_path, 'average_beta_Lures.nii');
-    New     = fullfile(data_path, 'average_beta_New.nii');
+    Odd  = fullfile(data_path, 'glm_T_stats_odd.nii');
+    Even = fullfile(data_path, 'glm_T_stats_even.nii');
     
     mask_fn  = fullfile(study_path, [roi_label '_Mask.nii']); %second half of mask name
 
     % load two halves as CoSMoMVPA dataset structs.
     % Chunks = Runs  Targets = trial type conditions
-    Target_ds  = cosmo_fmri_dataset(Target,'mask',mask_fn,... %encoding... run 1 (chunk) Target(rem) will be identified as 1
-                                         'targets',(1)',... %ex: Rem
-                                         'chunks',(1)); %ex: encoding (avg. of all enc runs)
+    Odd_ds  = cosmo_fmri_dataset(Odd,'mask',mask_fn,...
+                            'targets',1:3, ...
+                            'chunks', 1);
 
-    Lure_ds = cosmo_fmri_dataset(Lure,'mask',mask_fn,...
-                                         'targets',(2)',... %ex. Know
-                                         'chunks',(1)); %encoding (avg. of all enc runs)
+    Even_ds  = cosmo_fmri_dataset(Even,'mask',mask_fn,...
+                            'targets',1:3, ...
+                            'chunks', 2);
 
-    New_ds  = cosmo_fmri_dataset(New,'mask',mask_fn,...
-                                         'targets',(3)',... %New
-                                         'chunks',(1)); %ret
-
-   
-
+    labels_odd  = {'Targets'; 'Lures'; 'New'}; %outcome of condition labeling
+    labels_even = {'Targets'; 'Lures'; 'New'};
+    Odd_ds.sa.labels  = labels_odd;
+    Even_ds.sa.labels = labels_even;
+                        
     % Combine files at encoding and retrieval to create two files (i.e.,
     % stacking)
     % make sure all ds_* changed from here on
-    ds_all = cosmo_stack({Target_ds, Lure_ds, New_ds});
+    ds_all = cosmo_stack({Odd_ds, Even_ds});
+    
+    % remove constant features
+    ds_all=cosmo_remove_useless_data(ds_all);
 
-    % Data set labels
-    ds_all.sa.labels = {'Targets';'Lures';'New'};
+    % print dataset
+    fprintf('Dataset input:\n');
+    cosmo_disp(ds_all);
     
     % cosmo fxn to make sure data in right format
     cosmo_check_dataset(ds_all);
     
     % Some sanity checks to ensure that the data has matching features (voxels)
     % and matching targets (conditions)
-%     assert(isequal(Target_ds.fa,Lure_ds.fa,New_ds.fa));
-%     assert(isequal(Target_ds.sa.targets,Lure_ds.sa.targets,New_ds.sa.targets));
+    assert(isequal(Odd_ds.fa,Even_ds.fa));
+    assert(isequal(Odd_ds.sa.targets,Odd_ds.sa.targets));
 
     % change if you change ds_* above
     nClasses = numel(ds_all.sa.labels);  %%why isn't this pulling all labels?(NAD10.31.16)
@@ -96,6 +105,16 @@ for ss = 1:length(subjects)
     % >@@>
     z = atanh(rho);
     % <@@<
+%%
+    figure
+    % >@@>
+    imagesc(z);
+    colorbar()
+    set(gca, 'xtick', 1:numel(Odd_ds.sa.labels), ...
+                    'xticklabel', Odd_ds.sa.labels)
+    set(gca, 'ytick', 1:numel(Even_ds.sa.labels), ...
+                    'yticklabel', Even_ds.sa.labels)
+    title(subjects{ss})
 
     % <@@<
 
@@ -125,16 +144,16 @@ for ss = 1:length(subjects)
     % Set the contrast matrix as described above and assign it to a variable
     % named 'contrast_matrix'
     % >@@>
-    contrast_matrix = (eye(nClasses)-1\nClasses)\(nClasses-1);
+    contrast_matrix = (eye(nClasses)-1/nClasses)/(nClasses-1);
 
     % alternative solution
     contrast_matrix_alt = zeros(nClasses,nClasses);
     for k = 1:nClasses
         for j = 1:nClasses
             if k == j
-                value = 1\nClasses;
+                value = 1/nClasses;
             else
-                value = -1\(nClasses*(nClasses-1));
+                value = -1/(nClasses*(nClasses-1));
             end
             contrast_matrix_alt(k,j) = value;
         end
