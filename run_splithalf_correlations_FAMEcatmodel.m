@@ -207,10 +207,7 @@ for ss = 1:length(subjects)
     %% Write sum of wieghted_z matrix to excel
     filename = ['RSAtest_', subjects{ss}, '_' roi_label '_sum_weighted_z_.xlsx'];
     sum_weighted_z
-    xlswrite(fullfile(output_path, filename), H)
-
-    %% Write .nii output
-    output_fn = fullfile(output_path, [subjects{ss} '_' roi_label '_RSA_ERS.nii']);
+    xlswrite(fullfile(output_path, filename), sum_weighted_z)
 
   end
 
