@@ -15,11 +15,11 @@ cont_vector = zeros(2,length(SPM.xX.name));
 
 % Odd Runs
 cont_name{1} = [cond '_Odd'];
-cont_vector(1, matches(1:2:length(matches))) = 1;
+cont_vector(1, matches(1:2:length(matches))) = 1/length(matches(1:2:length(matches)));
 
 % Even Runs
 cont_name{2} = [cond '_Even'];
-cont_vector(2, matches(2:2:length(matches))) = 1;
+cont_vector(2, matches(2:2:length(matches))) = 1/length(matches(2:2:length(matches)));
 
 % Set the conmanager parameters calculate odd and even run betas
 matlabbatch = set_conmanger(SPMmat, cont_name, cont_vector);
